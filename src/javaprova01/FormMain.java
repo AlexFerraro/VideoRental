@@ -126,7 +126,7 @@ public class FormMain extends javax.swing.JFrame {
         List<Assessment> listAssessments = new ArrayList<>();
         String[] content = null;
         
-        Scanner scanner = new Scanner(new File("..\\JavaProva01\\Data\\Lista_de_filmes.csv")); 
+        Scanner scanner = new Scanner(new File("..\\VideoRental\\Data\\Lista_de_filmes.csv")); 
         scanner.useDelimiter("\n");   
         
         while(scanner.hasNext())
@@ -136,7 +136,7 @@ public class FormMain extends javax.swing.JFrame {
             listMovies.add(new Movie(Integer.parseInt(content[0]), content[1], content[2], content[3]));                   
         }
         
-        scanner = new Scanner(new File("..\\JavaProva01\\Data\\Avaliações.csv"));       
+        scanner = new Scanner(new File("..\\VideoRental\\Data\\Avaliações.csv"));       
         scanner.useDelimiter("\n");
         
         while(scanner.hasNext())
