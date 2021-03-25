@@ -3,29 +3,30 @@ package javaprova01;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class Opinions 
 {
-    private Assessment[] assessments;
+    private Rating[] ratings;
     
-    public Opinions(Assessment[] assessments) {
-        this.assessments = assessments;
+    public Opinions(Rating[] ratings) {
+        this.ratings = ratings;
     } 
     
-    private List<Assessment> selectMovieAssessmentsByID(int elementIDParameter)
+    private List<Rating> selectMovieRatingsByID(int elementIDParameter)
     {
-       List<Assessment> listAssessments = new ArrayList<>();
+       List<Rating> listRatings = new ArrayList<>();
        int elementID = elementIDParameter;
          
-       for (Assessment assessment : assessments) 
+       for (Rating rating : ratings) 
        {
-           if(assessment.getMovieFK() == elementID)
+           if(rating.getMovieFK() == elementID)
            {
-                listAssessments.add(assessment);
+                listRatings.add(rating);
            }         
        }
        
-       return listAssessments;
+       return listRatings;
     }
     
     public double totalAverageMovieRating(int elementIDParameter) 
@@ -33,11 +34,11 @@ public class Opinions
        double media = 0;
        int elementID = elementIDParameter, totalElements = 0;
          
-       for (Assessment assessment : assessments) 
+       for (Rating rating : ratings) 
        {
-           if(assessment.getMovieFK() == elementID)
+           if(rating.getMovieFK() == elementID)
            {
-                media += assessment.getNote();
+                media += rating.getNote();
                 totalElements++;
            }         
        }
@@ -45,39 +46,85 @@ public class Opinions
        return media / totalElements;
     }
     
-    public Assessment highestRatedMovie(int elementIDParameter) 
+    public Rating highestRatedMovie(int elementIDParameter) 
     {
-       List listassessments = selectMovieAssessmentsByID(elementIDParameter);
+       List listRatings = selectMovieRatingsByID(elementIDParameter);
+       Rating rating = null;
        
-       Collections.sort(listassessments, (Assessment a, Assessment b) -> {
+       /*Old code
+       Collections.sort(listRatings, (Rating a, Rating b) -> {
                     if(a.getNote() > b.getNote()) return 1;
                     else if(a.getNote() < b.getNote()) return -1;
                     return 0;
        });
        
-       return ((Assessment) listassessments.get(listassessments.size() -1));
+       return ((Rating) listRatings.get(listRatings.size() -1));
+       */
+       
+       try
+       {
+           rating = Collections.max(listRatings, (Rating a, Rating b) -> 
+                    {
+                        if(a.getNote() > b.getNote()) return 1;
+                        else if(a.getNote() < b.getNote()) return -1;
+                        return 0;
+                    });
+           
+       }catch (ClassCastException ex) 
+       {
+            System.out.println("Exception thrown : " + ex);
+       }catch (NoSuchElementException ex) 
+       {
+            System.out.println("Exception thrown : " + ex);
+            throw ex;
+       }
+       
+       return rating;
     }
 
-    public Assessment worstRatedMovie(int elementIDParameter) 
+    public Rating worstRatedMovie(int elementIDParameter) 
     {
-       List listassessments = selectMovieAssessmentsByID(elementIDParameter);
+       List listRatings = selectMovieRatingsByID(elementIDParameter);
+       Rating rating = null;
        
-       Collections.sort(listassessments, (Assessment a, Assessment b) -> {
+       /*Old code
+       Collections.sort(listRatins, (Rating a, Rating b) -> {
                     if(a.getNote() > b.getNote()) return -1;
                     else if(a.getNote() < b.getNote()) return 1;
                     return 0;
        });
        
-       return ((Assessment) listassessments.get(listassessments.size() -1));
+       return ((Rating) listRatins.get(listRatins.size() -1));
+       */
+       
+       try
+       {
+           rating = Collections.min(listRatings, (Rating a, Rating b) -> 
+                    {
+                        if(a.getNote() > b.getNote()) return 1;
+                        else if(a.getNote() < b.getNote()) return -1;
+                        return 0;
+                    });
+           
+       }catch (ClassCastException ex) 
+       {
+            System.out.println("Exception thrown : " + ex);
+       }catch (NoSuchElementException ex) 
+       {
+            System.out.println("Exception thrown : " + ex);
+            throw ex;
+       }
+       
+       return rating;
     }
             
-    public Assessment[] getAssessments() 
+    public Rating[] getRatings() 
     {
-        return assessments;
+        return ratings;
     }
 
-    public void setAssessments(Assessment[] assessments) 
+    public void setRatings(Rating[] ratings) 
     {
-        this.assessments = assessments;
+        this.ratings = ratings;
     }  
 }

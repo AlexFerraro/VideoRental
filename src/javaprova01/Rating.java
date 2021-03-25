@@ -1,13 +1,13 @@
 package javaprova01;
 
-public class Assessment 
+public class Rating 
 {
     private int movieFK;
     private String evaluator;
     private int note;
     private String comment;
 
-    public Assessment(int movieFK, String evaluator, int note, String comment) 
+    public Rating(int movieFK, String evaluator, int note, String comment) 
     {
         this.movieFK = movieFK;
         this.evaluator = evaluator;

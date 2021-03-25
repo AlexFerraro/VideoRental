@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 
 public class FormMain extends javax.swing.JFrame {
     private VideoRental videoRental;
@@ -149,32 +149,46 @@ public class FormMain extends javax.swing.JFrame {
     private void getAllMovies() throws FileNotFoundException
     {
         List<Movie> listMovies = new ArrayList<>();
-        List<Assessment> listAssessments = new ArrayList<>();
+        List<Rating> listRatings = new ArrayList<>();
         String[] content = null;
+        Scanner scanner = null;
         
-        Scanner scanner = new Scanner(new File("..\\VideoRental\\Data\\Lista_de_filmes.csv")); 
-        scanner.useDelimiter("\n");   
-        
-        while(scanner.hasNext())
+        try
         {
-            content = scanner.next().trim().split(";");
-            
-            listMovies.add(new Movie(Integer.parseInt(content[0]), content[1], content[2], content[3]));                   
+            scanner = new Scanner(new File("..\\VideoRental\\Data\\Lista_de_filmes.csv")); 
+            scanner.useDelimiter("\n");   
+        
+            while(scanner.hasNext())
+            {
+                content = scanner.next().trim().split(";");
+
+                listMovies.add(new Movie(Integer.parseInt(content[0]), content[1], content[2], content[3]));                   
+            }
+        }catch(FileNotFoundException ex)
+        {
+            JOptionPane.showMessageDialog(this, "Não foi possível encontrar o arquivo de filmes.", "Erro ao buscar o arquivo", JOptionPane.ERROR_MESSAGE);
         }
         
-        scanner = new Scanner(new File("..\\VideoRental\\Data\\Avaliações.csv"));       
-        scanner.useDelimiter("\n");
-        
-        while(scanner.hasNext())
+        try
         {
-            content = scanner.next().trim().split(";");
-            
-            listAssessments.add(new Assessment(Integer.parseInt(content[0]), content[1], Integer.parseInt(content[2]), content[3]));         
+            scanner = new Scanner(new File("..\\VideoRental\\Data\\Avaliações.csv"));       
+            scanner.useDelimiter("\n");
+        
+            while(scanner.hasNext())
+            {
+                content = scanner.next().trim().split(";");
+
+                listRatings.add(new Rating(Integer.parseInt(content[0]), content[1], Integer.parseInt(content[2]), content[3]));         
+            }
+        }catch(FileNotFoundException ex)
+        {
+            JOptionPane.showMessageDialog(this, "Não foi possível encontrar o arquivo de avaliações.", "Erro ao buscar o arquivo", JOptionPane.ERROR_MESSAGE);
         }
+            
         scanner.close();
         
         videoRental = new VideoRental(listMovies.toArray(new Movie[listMovies.size()]));       
-        opinions = new Opinions(listAssessments.toArray(new Assessment[listAssessments.size()]));
+        opinions = new Opinions(listRatings.toArray(new Rating[listRatings.size()]));
     }
     private void fillComboBoxMovies() 
     {
@@ -203,8 +217,8 @@ public class FormMain extends javax.swing.JFrame {
     }
     private void ButtonSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonSelectActionPerformed
         Movie movie = null;
-        Assessment highAssessment = null;
-        Assessment lowAssessment = null;
+        Rating highRating = null;
+        Rating lowRating = null;
         String selectedName = null; 
         int movieIndex = -1;
         DefaultListModel model = new DefaultListModel();
@@ -219,18 +233,31 @@ public class FormMain extends javax.swing.JFrame {
         model.addElement("Genero: " + movie.getGenre());     
         model.addElement("Média de avaliações: " + String.format("%.2f", opinions.totalAverageMovieRating(movie.getMovieID())));
         
-        highAssessment = opinions.highestRatedMovie(movie.getMovieID());
-        model.addElement("Nome do Avaliador: " + highAssessment.getEvaluator());
-        model.addElement("Comentário do Avaliador: " + highAssessment.getComment());
-        model.addElement("Nota mais alta: " + highAssessment.getNote());
+        try
+        {        
+           highRating = opinions.highestRatedMovie(movie.getMovieID());
+           model.addElement("Nome do Avaliador: " + highRating.getEvaluator());
+           model.addElement("Comentário do Avaliador: " + highRating.getComment());
+           model.addElement("Nota mais alta: " + highRating.getNote());
+        }catch (NoSuchElementException ex) 
+        {
+            JOptionPane.showMessageDialog(this, "Não foi possível exibir a melhor avaliação para esse filme, pois não existe cadastro de avaliação para o mesmo.", 
+                    "Falha ao processar melhor avaliação", JOptionPane.ERROR_MESSAGE);
+        }
         
-        lowAssessment = opinions.worstRatedMovie(movie.getMovieID());
-        model.addElement("Nome do Avaliador: " + lowAssessment.getEvaluator());
-        model.addElement("Comentário do Avaliador: " + lowAssessment.getComment());
-        model.addElement("Nota mais baixa: " + lowAssessment.getNote());
-        
-        TextAreaSynopsis.setText(movie.getSynopsis());   
-        
+        try
+        {        
+           lowRating = opinions.worstRatedMovie(movie.getMovieID());
+           model.addElement("Nome do Avaliador: " + lowRating.getEvaluator());
+           model.addElement("Comentário do Avaliador: " + lowRating.getComment());
+           model.addElement("Nota mais baixa: " + lowRating.getNote());
+        }catch (NoSuchElementException ex) 
+        {
+            JOptionPane.showMessageDialog(this, "Não foi possível exibir a pior avaliação para esse filme, pois não existe cadastro de avaliação para o mesmo.", 
+                    "Falha ao processar pior avaliação", JOptionPane.ERROR_MESSAGE);
+        }
+            
+        TextAreaSynopsis.setText(movie.getSynopsis());     
         ImageLable.setIcon(new ImageIcon(getPathFilmCover(selectedName)));
     }//GEN-LAST:event_ButtonSelectActionPerformed
 
